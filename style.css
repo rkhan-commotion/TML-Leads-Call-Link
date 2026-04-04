@@ -6,28 +6,326 @@
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background: #f5f5f5;
-  color: #333;
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+  color: #e2e8f0;
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
+  padding: 1rem;
 }
 
-.container {
-  text-align: center;
-  padding: 2rem;
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+.card {
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 440px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+}
+
+.card-header {
+  padding: 1.5rem 1.5rem 0;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
 }
 
 h1 {
-  margin-bottom: 1rem;
-  font-size: 2rem;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #f1f5f9;
 }
 
-p {
-  color: #666;
-  font-size: 1.1rem;
+.subtitle {
+  font-size: 0.8rem;
+  color: #94a3b8;
+}
+
+form {
+  padding: 1.5rem;
+}
+
+.form-group {
+  margin-bottom: 1.25rem;
+}
+
+label {
+  display: block;
+  font-weight: 600;
+  font-size: 0.8rem;
+  color: #94a3b8;
+  margin-bottom: 0.4rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+input,
+select {
+  width: 100%;
+  padding: 0.7rem 0.75rem;
+  background: #0f172a;
+  border: 1px solid #334155;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  color: #e2e8f0;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.phone-input-wrapper {
+  display: flex;
+  align-items: center;
+  background: #0f172a;
+  border: 1px solid #334155;
+  border-radius: 10px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.phone-input-wrapper:focus-within {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+.phone-prefix {
+  padding: 0.7rem 0 0.7rem 0.75rem;
+  color: #94a3b8;
+  font-size: 0.95rem;
+  font-weight: 600;
+  white-space: nowrap;
+  user-select: none;
+}
+
+.phone-input-wrapper input {
+  border: none;
+  background: transparent;
+  padding-left: 0.4rem;
+}
+
+.phone-input-wrapper input:focus {
+  box-shadow: none;
+}
+
+input::placeholder {
+  color: #475569;
+}
+
+input:focus,
+select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+select {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12' fill='%2394a3b8'%3E%3Cpath d='M6 8.825L1.175 4 2.238 2.938 6 6.7 9.763 2.937 10.825 4z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  padding-right: 2rem;
+}
+
+select option {
+  background: #1e293b;
+  color: #e2e8f0;
+}
+
+/* Submit button */
+button[type="submit"] {
+  width: 100%;
+  padding: 0.8rem;
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+button[type="submit"]:hover {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+}
+
+button[type="submit"]:active {
+  transform: translateY(0);
+}
+
+button[type="submit"]:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.btn-arrow {
+  transition: transform 0.2s;
+}
+
+button[type="submit"]:hover .btn-arrow {
+  transform: translateX(3px);
+}
+
+/* Status */
+.status {
+  margin-top: 1rem;
+  font-size: 0.85rem;
+  text-align: center;
+  min-height: 1.2rem;
+  border-radius: 8px;
+  padding: 0;
+  transition: all 0.2s;
+}
+
+.status.success {
+  color: #4ade80;
+  background: rgba(74, 222, 128, 0.08);
+  padding: 0.6rem;
+}
+
+.status.error {
+  color: #f87171;
+  background: rgba(248, 113, 113, 0.08);
+  padding: 0.6rem;
+}
+
+/* Post-call section */
+.post-call {
+  margin-top: 0;
+  padding: 0 1.5rem 1.5rem;
+  border-top: 1px solid #334155;
+  padding-top: 1.25rem;
+}
+
+.session-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #0f172a;
+  border: 1px solid #334155;
+  border-radius: 10px;
+  padding: 0.6rem 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.session-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.session-id {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #3b82f6;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+}
+
+.feedback-btn {
+  width: 100%;
+  padding: 0.7rem;
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s;
+}
+
+.feedback-btn:hover {
+  background: linear-gradient(135deg, #059669, #047857);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.feedback-btn:active {
+  transform: translateY(0);
+}
+
+.post-call-note {
+  text-align: center;
+  font-size: 0.75rem;
+  color: #64748b;
+  margin-top: 0.5rem;
+  font-style: italic;
+}
+
+/* Feedback form */
+.feedback-form {
+  margin-top: 0.75rem;
+}
+
+.feedback-form h3 {
+  font-size: 0.95rem;
+  color: #e2e8f0;
+  text-align: center;
+  margin-bottom: 0.75rem;
+}
+
+.feedback-form textarea {
+  width: 100%;
+  padding: 0.75rem;
+  background: #0f172a;
+  border: 1px solid #334155;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  color: #e2e8f0;
+  font-family: inherit;
+  resize: vertical;
+  min-height: 120px;
+  margin-bottom: 0.75rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.feedback-form textarea::placeholder {
+  color: #475569;
+}
+
+.feedback-form textarea:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+.feedback-submit-btn {
+  width: 100%;
+  padding: 0.7rem;
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s;
+}
+
+.feedback-submit-btn:hover {
+  background: linear-gradient(135deg, #059669, #047857);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.feedback-submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
 }

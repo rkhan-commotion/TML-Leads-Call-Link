@@ -7,9 +7,263 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="container">
-    <h1>TML Leads Call Link</h1>
-    <p>Welcome to the TML Leads Call Link portal.</p>
+  <div class="card">
+    <div class="card-header">
+      <div class="logo">
+        <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+          <rect width="36" height="36" rx="8" fill="#1B4DDB"/>
+          <path d="M10 12h16v2H10zm0 5h10v2H10zm0 5h13v2H10z" fill="#fff"/>
+        </svg>
+        <div>
+          <h1>TML Leads</h1>
+          <span class="subtitle">Request a callback from our team</span>
+        </div>
+      </div>
+    </div>
+
+    <form id="leadForm">
+      <div class="form-group">
+        <label for="name">Full Name</label>
+        <input type="text" id="name" name="name" placeholder="John Doe" required>
+      </div>
+
+      <div class="form-group">
+        <label for="phone">Phone Number</label>
+        <div class="phone-input-wrapper">
+          <span class="phone-prefix">+91</span>
+          <input type="tel" id="phone" name="phone" placeholder="98765 43210" maxlength="10" pattern="[0-9]{10}" required>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="car">Select Car</label>
+        <select id="car" name="car" required>
+          <option value="" disabled selected>Choose a Tata Motors car</option>
+          <option value="Tiago">Tiago</option>
+          <option value="Tigor">Tigor</option>
+          <option value="Altroz">Altroz</option>
+          <option value="Nexon">Nexon</option>
+          <option value="Harrier">Harrier</option>
+          <option value="Safari">Safari</option>
+          <option value="Punch">Punch</option>
+          <option value="Curvv">Curvv</option>
+          <option value="Sierra">Sierra</option>
+        </select>
+      </div>
+
+      <button type="submit" id="submitBtn">
+        <span class="btn-text">Request Callback</span>
+        <svg class="btn-arrow" viewBox="0 0 20 20" fill="currentColor" width="18" height="18"><path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+      </button>
+
+      <div id="status" class="status"></div>
+
+    </form>
+
+    <div id="postCall" class="post-call" style="display: none;">
+      <div class="session-info">
+        <span class="session-label">Session ID</span>
+        <span class="session-id" id="sessionId"></span>
+      </div>
+      <button type="button" id="feedbackBtn" class="feedback-btn">
+        Share Feedback
+      </button>
+      <p class="post-call-note">* Click after call is completed</p>
+
+      <div id="feedbackForm" class="feedback-form" style="display: none;">
+        <h3>Share your feedback</h3>
+        <textarea id="feedbackComments" placeholder="How was your call experience? Share your thoughts..." rows="6"></textarea>
+        <button type="button" id="submitFeedbackBtn" class="feedback-submit-btn">Submit Feedback</button>
+        <div id="feedbackStatus" class="status"></div>
+      </div>
+    </div>
   </div>
+
+  <script>
+    // Only allow digits, max 10
+    document.getElementById('phone').addEventListener('input', function () {
+      this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);
+    });
+
+    function generateRequestId() {
+      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+      let id = '';
+      for (let i = 0; i < 12; i++) {
+        id += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      return id;
+    }
+
+    // Store call details for feedback
+    let lastCallDetails = {};
+
+    document.getElementById('leadForm').addEventListener('submit', async function (e) {
+      e.preventDefault();
+
+      const name = document.getElementById('name').value.trim();
+      const phone = document.getElementById('phone').value.trim();
+      const car = document.getElementById('car').value;
+      const statusEl = document.getElementById('status');
+      const submitBtn = document.getElementById('submitBtn');
+
+      if (phone.length !== 10) {
+        statusEl.textContent = 'Please enter a valid 10-digit phone number.';
+        statusEl.className = 'status error';
+        return;
+      }
+
+      const phoneWith91 = '91' + phone;
+
+      submitBtn.disabled = true;
+      submitBtn.querySelector('.btn-text').textContent = 'Submitting...';
+      statusEl.className = 'status';
+      statusEl.textContent = '';
+
+      const payload = {
+        name: 'initiate_call',
+        eventProperties: {
+          case: 'tml-leads',
+          context: `name: ${name}, car: ${car}`,
+          request_id: generateRequestId()
+        },
+        userProperties: {
+          phoneNumber: phoneWith91
+        },
+        type: 'TRACK',
+        contractSource: 'WEBSITE',
+        apiKey: '0b0f54d5-d81a-4642-9bcb-ede9ccdc28ed'
+      };
+
+      console.log('--- FORM SUBMIT START ---');
+      console.log('Name:', name);
+      console.log('Phone:', phone);
+      console.log('Car:', car);
+      console.log('Payload:', JSON.stringify(payload, null, 2));
+      console.log('Firing POST to:', 'https://uat-services.solutions.tatacommunications.com/sm-callbacks/sdkevent/callback');
+
+      try {
+        const response = await fetch(
+          'https://uat-services.solutions.tatacommunications.com/sm-callbacks/sdkevent/callback',
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          }
+        );
+
+        console.log('Response status:', response.status);
+        console.log('Response ok:', response.ok);
+        const responseBody = await response.text();
+        console.log('Response body:', responseBody);
+
+        if (response.ok) {
+          console.log('--- SUCCESS ---');
+          statusEl.textContent = 'Submitted successfully! You will receive a callback shortly.';
+          statusEl.className = 'status success';
+
+          // Save call details for feedback
+          lastCallDetails = { name, phone: phoneWith91, car };
+
+          // Show post-call section with sessionId
+          document.getElementById('sessionId').textContent = payload.eventProperties.request_id;
+          document.getElementById('postCall').style.display = 'block';
+
+          e.target.reset();
+        } else {
+          console.log('--- FAILED (non-2xx) ---');
+          statusEl.textContent = `Submission failed (${response.status}). Please try again.`;
+          statusEl.className = 'status error';
+        }
+      } catch (err) {
+        console.error('--- NETWORK ERROR ---', err);
+        statusEl.textContent = 'Network error. Please check your connection and try again.';
+        statusEl.className = 'status error';
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.querySelector('.btn-text').textContent = 'Request Callback';
+      }
+    });
+    // Feedback button — hide lead form, show feedback form
+    document.getElementById('feedbackBtn').addEventListener('click', function () {
+      document.getElementById('leadForm').style.display = 'none';
+      document.getElementById('status').style.display = 'none';
+      this.style.display = 'none';
+      document.querySelector('.post-call-note').style.display = 'none';
+      document.getElementById('feedbackForm').style.display = 'block';
+    });
+
+    // Submit feedback to Google Sheet
+    document.getElementById('submitFeedbackBtn').addEventListener('click', async function () {
+      const sessionId = document.getElementById('sessionId').textContent;
+      const comments = document.getElementById('feedbackComments').value.trim();
+      const feedbackStatus = document.getElementById('feedbackStatus');
+
+      if (!comments) {
+        feedbackStatus.textContent = 'Please enter your feedback.';
+        feedbackStatus.className = 'status error';
+        return;
+      }
+
+      this.disabled = true;
+      this.textContent = 'Submitting...';
+
+      const feedbackPayload = {
+        sessionId: sessionId,
+        name: lastCallDetails.name,
+        phone: lastCallDetails.phone,
+        car: lastCallDetails.car,
+        comments: comments
+      };
+
+      console.log('Submitting feedback:', JSON.stringify(feedbackPayload, null, 2));
+
+      try {
+        const SHEET_URL = 'https://script.google.com/macros/s/AKfycbykVDE9gYJuvn_NhWOBYwMiTG_PHIkOFEy6Hf9RoIKEx09Du0h6MOuIW2TpGirk60jz-Q/exec';
+        const params = new URLSearchParams({
+          sessionId: feedbackPayload.sessionId,
+          name: feedbackPayload.name,
+          phone: feedbackPayload.phone,
+          car: feedbackPayload.car,
+          comments: feedbackPayload.comments
+        });
+        const url = SHEET_URL + '?' + params.toString();
+        console.log('Feedback URL:', url);
+
+        // Use image trick for reliable cross-origin GET
+        var img = new Image();
+        img.src = url;
+
+        feedbackStatus.textContent = 'Thank you for your feedback!';
+        feedbackStatus.className = 'status success';
+        console.log('--- FEEDBACK SUBMITTED ---');
+
+        // Reset back to original form after 2 seconds
+        setTimeout(function () {
+          document.getElementById('leadForm').style.display = '';
+          document.getElementById('status').style.display = '';
+          document.getElementById('status').textContent = '';
+          document.getElementById('status').className = 'status';
+          document.getElementById('postCall').style.display = 'none';
+          document.getElementById('feedbackForm').style.display = 'none';
+          document.getElementById('feedbackBtn').style.display = '';
+          document.querySelector('.post-call-note').style.display = '';
+          document.getElementById('feedbackComments').value = '';
+          document.getElementById('feedbackComments').disabled = false;
+          document.getElementById('submitFeedbackBtn').style.display = '';
+          document.getElementById('submitFeedbackBtn').disabled = false;
+          document.getElementById('submitFeedbackBtn').textContent = 'Submit Feedback';
+          feedbackStatus.textContent = '';
+          feedbackStatus.className = 'status';
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }, 2000);
+      } catch (err) {
+        console.error('Feedback error:', err);
+        feedbackStatus.textContent = 'Failed to submit feedback. Please try again.';
+        feedbackStatus.className = 'status error';
+        this.disabled = false;
+        this.textContent = 'Submit Feedback';
+      }
+    });
+  </script>
 </body>
 </html>
