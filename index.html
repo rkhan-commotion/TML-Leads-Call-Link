@@ -23,20 +23,7 @@
 
     <form id="leadForm">
       <div class="form-group">
-        <label for="name">Full Name</label>
-        <input type="text" id="name" name="name" placeholder="John Doe" required>
-      </div>
-
-      <div class="form-group">
-        <label for="phone">Phone Number</label>
-        <div class="phone-input-wrapper">
-          <span class="phone-prefix">+91</span>
-          <input type="tel" id="phone" name="phone" placeholder="98765 43210" maxlength="10" pattern="[0-9]{10}" required>
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label for="car">Select Car</label>
+        <label for="car">Car Name</label>
         <select id="car" name="car" required>
           <option value="" disabled selected>Choose a Tata Motors car</option>
           <option value="Tiago">Tiago</option>
@@ -49,6 +36,29 @@
           <option value="Curvv">Curvv</option>
           <option value="Sierra">Sierra</option>
         </select>
+      </div>
+
+      <div class="form-group">
+        <label for="phone">Phone Number</label>
+        <div class="phone-input-wrapper">
+          <span class="phone-prefix">+91</span>
+          <input type="tel" id="phone" name="phone" placeholder="99673 38128" maxlength="10" pattern="[0-9]{10}" required>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="pincode">Pincode <span class="optional-tag">(Optional)</span></label>
+        <input type="text" id="pincode" name="pincode" placeholder="400001" maxlength="6" pattern="[0-9]{6}">
+      </div>
+
+      <div class="form-group">
+        <label for="name">Full Name</label>
+        <input type="text" id="name" name="name" placeholder="John Doe" required>
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email ID <span class="optional-tag">(Optional)</span></label>
+        <input type="email" id="email" name="email" placeholder="john@example.com">
       </div>
 
       <button type="submit" id="submitBtn">
@@ -85,6 +95,11 @@
       this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);
     });
 
+    // Only allow digits, max 6
+    document.getElementById('pincode').addEventListener('input', function () {
+      this.value = this.value.replace(/[^0-9]/g, '').slice(0, 6);
+    });
+
     function generateRequestId() {
       const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
       let id = '';
@@ -100,9 +115,11 @@
     document.getElementById('leadForm').addEventListener('submit', async function (e) {
       e.preventDefault();
 
-      const name = document.getElementById('name').value.trim();
-      const phone = document.getElementById('phone').value.trim();
       const car = document.getElementById('car').value;
+      const phone = document.getElementById('phone').value.trim();
+      const pincode = document.getElementById('pincode').value.trim();
+      const name = document.getElementById('name').value.trim();
+      const email = document.getElementById('email').value.trim();
       const statusEl = document.getElementById('status');
       const submitBtn = document.getElementById('submitBtn');
 
@@ -119,12 +136,16 @@
       statusEl.className = 'status';
       statusEl.textContent = '';
 
+      const requestId = generateRequestId();
       const payload = {
-        name: 'initiate_call',
+        name: 'Booking Callback Registered New',
         eventProperties: {
-          case: 'tml-leads',
-          context: `name: ${name}, car: ${car}`,
-          request_id: generateRequestId()
+          car_name: car,
+          phoneNumber: phoneWith91,
+          pincode: pincode,
+          variant_name: requestId,
+          full_name: name,
+          email_id: email
         },
         userProperties: {
           phoneNumber: phoneWith91
@@ -135,9 +156,6 @@
       };
 
       console.log('--- FORM SUBMIT START ---');
-      console.log('Name:', name);
-      console.log('Phone:', phone);
-      console.log('Car:', car);
       console.log('Payload:', JSON.stringify(payload, null, 2));
       console.log('Firing POST to:', 'https://uat-services.solutions.tatacommunications.com/sm-callbacks/sdkevent/callback');
 
@@ -162,10 +180,10 @@
           statusEl.className = 'status success';
 
           // Save call details for feedback
-          lastCallDetails = { name, phone: phoneWith91, car };
+          lastCallDetails = { name, phone: phoneWith91, car, pincode, email };
 
           // Show post-call section with sessionId
-          document.getElementById('sessionId').textContent = payload.eventProperties.request_id;
+          document.getElementById('sessionId').textContent = requestId;
           document.getElementById('postCall').style.display = 'block';
 
           e.target.reset();

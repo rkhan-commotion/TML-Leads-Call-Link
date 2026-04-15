@@ -64,6 +64,14 @@ label {
   letter-spacing: 0.05em;
 }
 
+.optional-tag {
+  font-weight: 400;
+  font-size: 0.7rem;
+  color: #64748b;
+  text-transform: none;
+  letter-spacing: normal;
+}
+
 input,
 select {
   width: 100%;
