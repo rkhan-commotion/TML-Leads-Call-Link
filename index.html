@@ -106,7 +106,7 @@
       for (let i = 0; i < 12; i++) {
         id += chars.charAt(Math.floor(Math.random() * chars.length));
       }
-      return id;
+      return 'tml_' + id;
     }
 
     // Store call details for feedback
@@ -138,10 +138,9 @@
 
       const requestId = generateRequestId();
       const payload = {
-        name: 'Booking Callback Registered New',
+        name: 'Trigger_Call',
         eventProperties: {
           car_name: car,
-          phoneNumber: phoneWith91,
           pincode: pincode,
           variant_name: requestId,
           full_name: name,
@@ -152,7 +151,7 @@
         },
         type: 'TRACK',
         contractSource: 'WEBSITE',
-        apiKey: '0b0f54d5-d81a-4642-9bcb-ede9ccdc28ed'
+        apiKey: '3b507caa-37db-4029-89da-4ee2f4fe658f'
       };
 
       console.log('--- FORM SUBMIT START ---');
