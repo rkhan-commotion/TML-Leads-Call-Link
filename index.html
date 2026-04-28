@@ -138,13 +138,16 @@
 
       const requestId = generateRequestId();
       const payload = {
-        name: 'Trigger_Call',
+        name: 'Trigger_Call_V2',
         eventProperties: {
+          email_id: email,
           car_name: car,
+          phoneNumber: phoneWith91,
           pincode: pincode,
           variant_name: requestId,
           full_name: name,
-          email_id: email
+          props_1: '',
+          props_2: ''
         },
         userProperties: {
           phoneNumber: phoneWith91
